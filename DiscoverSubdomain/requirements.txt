@@ -1,0 +1,7 @@
+requests
+dnspython
+gevent
+tldextract
+yagmail
+termcolor
+lxml
