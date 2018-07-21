@@ -26,8 +26,8 @@ class domain_get:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-v', '--version', action='version', version='[+]Hellfarm v1.1')
-    parser.add_argument('-u' , '--domain',  type=str,  help='Url you wish to fuzz')
+    parser.add_argument('-v', '--version', action='version', version='[+]Hellfarm v1.2')
+    parser.add_argument('-d' , '--domain',  type=str,  help='domain you wish to search')
     #parser.add_argument('-t' , '--thread',  type=int,  default=10,  help='Threads for this bitch script')
     parser.add_argument('-o', '--output',  type=str,    help="Output name for this scan")
     args = parser.parse_args()
