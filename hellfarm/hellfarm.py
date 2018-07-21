@@ -7,7 +7,7 @@ class domain_get:
     def __init__(self, args):
         self.modules = [
             'api_subdomain_search',
-            'gitleak',
+            'git_leak',
             'search_engine_spider'
         ]
         self.domain = args.domain
