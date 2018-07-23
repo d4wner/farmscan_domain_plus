@@ -10,7 +10,7 @@ from random import choice
 import re
 import threadpool
 
-
+    
 def page(url):
     #if not _page:
     r = requests.get(url,  headers = global_header ,timeout=10)
@@ -38,7 +38,7 @@ def sogouURLs(url):
 
 
 def exploit(root_domain):
-    global email_list, domain_list, global_header,global_timeout
+    global email_list, domain_list, global_header,global_timeout,root_domain
     email_list = []
     domain_list = []  
     global_timeout = 10
@@ -211,6 +211,6 @@ def get_domain(orignal_resp):
 
 if __name__ == '__main__':
     #无需mode，传入root_domain即可
-    global root_domain
+    #global root_domain
     root_domain = 'venustech.com.cn'
     exploit(root_domain)
