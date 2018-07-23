@@ -10,7 +10,7 @@ from random import choice
 import re
 import threadpool
 
-    
+
 def page(url):
     #if not _page:
     r = requests.get(url,  headers = global_header ,timeout=10)
@@ -37,8 +37,9 @@ def sogouURLs(url):
 
 
 
-def exploit(root_domain):
+def exploit(domain):
     global email_list, domain_list, global_header,global_timeout,root_domain
+    root_domain = domain
     email_list = []
     domain_list = []  
     global_timeout = 10
