@@ -10,14 +10,15 @@ cd ./subDomainsBrute&&python subDomainsBrute.py $domain -o ../1$domain.txt
 cd ../Sublist3r&&python sublist3r.py -d $domain -o ../2$domain.txt
 cd ../teemo&&python teemo.py -d $domain -o ../../3$domain.txt
 cd ../GSDF&&python GSDFT.py -d $domain -s ../../4$domain.txt -e show
-cd ../DiscoverSubdomain&&python DiscoverSubdomain.py -d $domain
+cd ../DiscoverSubdomain&&python DiscoverSubdomain.py -d $domain -o ../5$domain.txt
 #已经进去一层了
-cp $domain*.txt ../5$domain.txt
-cd ../hellfarm&&python hellfarm.py -d $domain -o ../../6$domain.txt
+#cp $domain*.txt ../5$domain.txt
+cd ../hellfarm&&python hellfarm.py -d $domain -o ../6$domain.txt
 #python search_engine_spider.py -d $domain -o ../../6$domain.txt
+cd ..
 
 cat 3*.txt 5*.txt 6*.txt|grep @ >>mail
-cat 6*.txt |grep -v @>>a.txt
+#cat 6*.txt |grep -v @| grep -v / >>a.txt
 cat 1*.txt |awk '{print($1)}'>>a.txt
 cat 1*.txt |sed 's/,//g'|awk '{print($2)}'>>b.txt
 cat 4*.txt | grep -v "\[" | sed 's/\*\.//g'>>a.txt

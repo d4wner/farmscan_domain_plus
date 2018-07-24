@@ -174,11 +174,15 @@ def Email(file=None):
     except:
         traceback.print_exc() """
 
-def SaveFile(content, domain, assets=False, email=False):
+def SaveFile(content, domain, assets=False, email=False, output_path = ''):
     try:
         timestamp = time.time()
         #filename = domain.replace('.', '_') + '_' + str(timestamp) + '.json'
-        filename = domain.replace('.', '_') + '_' + str(timestamp) + '.txt'
+        #filename = domain.replace('.', '_') + '_' + str(timestamp) + '.txt'
+        if not  output_path:
+            filename = domain + '.' + str(timestamp) + '.txt'
+        else:
+            filename = output_path + '.' + str(timestamp) + '.txt'
         #data = json.dumps(content)
         with open(filename, 'w+') as fw:
             #fw.write(data+'\n')

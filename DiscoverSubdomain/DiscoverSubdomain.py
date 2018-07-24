@@ -16,7 +16,7 @@ sys.setdefaultencoding('utf-8')
 
 
 class SubDomains(object):
-    def __init__(self, domain, thread=100, mode=False):
+    def __init__(self, domain, thread=100,  mode=False, output_path=''):
         self.domain = domain
         self.thread = int(thread)
         self.mode = mode
@@ -24,6 +24,7 @@ class SubDomains(object):
         self.result = []
         self.apipath = 'modules.'
         self.cachefile ='cache.txt'
+        self.output_path = output_path
         self.apis = [
             'searchBy360',
             'searchByBing',
@@ -94,9 +95,9 @@ class SubDomains(object):
                     print colored('*' * 10 + 'Assets Discover Mode' + '*' * 10, 'yellow')
                     result = AssetsScan(list(set(self.result)))
 
-                    SaveFile(content=result, domain=self.domain)
+                    SaveFile(content=result, domain=self.domain, output_path = self.output_path)
                 else:
-                    SaveFile(content=list(set(self.result)), domain=self.domain)
+                    SaveFile(content=list(set(self.result)), domain=self.domain, output_path=self.output_path)
             else:
                 print colored('[-] Error: Please check domain or network is not normal', 'red')
         except:
@@ -116,12 +117,12 @@ if __name__ == "__main__":
     parser.add_argument('-d', "--domain", help="DomainName of scan target")
     parser.add_argument('-t', '--thread', default=100, help='Number of scan threads(default:100)')
     parser.add_argument('-f', '--full', default=False, help="Full dict files to brute(default:False)")
-
+    parser.add_argument('-o', '--output_path', default='', help="Output_path")	
     args = parser.parse_args()
     try:
         start_time = time.time()
         if args.domain:
-            Discover = SubDomains(domain=args.domain, thread=args.thread, mode=args.full)
+            Discover = SubDomains(domain=args.domain, thread=args.thread, mode=args.full, output_path=args.output_path)
             Discover.main()
             print '[-] All Done in %.1f s' % (time.time() - start_time)
         else:
