@@ -9,7 +9,7 @@ domain=$1
 cd ./subDomainsBrute&&python subDomainsBrute.py $domain -o ../1$domain.txt 
 cd ../Sublist3r&&python sublist3r.py -d $domain -o ../2$domain.txt
 cd ../teemo&&python teemo.py -d $domain -o ../../3$domain.txt
-cd ../GSDF&&python GSDFT.py -d $domain -s ../../4$domain.txt -e show
+cd ../GSDF&&python GSDFT.py -d $domain -s ../4$domain.txt -e show
 cd ../DiscoverSubdomain&&python DiscoverSubdomain.py -d $domain -o ../5$domain.txt
 #已经进去一层了
 #cp $domain*.txt ../5$domain.txt
@@ -45,3 +45,5 @@ rm -rf *.txt
 echo "IP段计算完毕，请查看ips文件"
 echo "邮箱计算完毕，请查看mail文件"
 echo "域名计算完毕，请查看domain文件"
+
+cp domain report/$domain.txt
