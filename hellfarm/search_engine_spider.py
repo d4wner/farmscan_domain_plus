@@ -213,5 +213,5 @@ def get_domain(orignal_resp):
 if __name__ == '__main__':
     #无需mode，传入root_domain即可
     #global root_domain
-    root_domain = 'venustech.com.cn'
+    root_domain = 'baidu.com'
     exploit(root_domain)
