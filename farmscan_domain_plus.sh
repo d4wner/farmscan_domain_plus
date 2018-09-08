@@ -29,7 +29,8 @@ do
 ipcalc -n $ip/28 |grep Network |awk '{print ($2)}'>>ips.txt
 done
 
-cat 6*.txt |grep / >>ips.txt
+cat 6*.txt | grep "[0-9]\{1,3\}[.][0-9]\{1,3\}[.][0-9]\{1,3\}[.][0-9]\{1,3\}" >>ips.txt
+cat 6*.txt | grep / >>ips.txt
 cat 3*.txt |grep / >>ips.txt
 
 cat ips.txt|sort|uniq >>ips
