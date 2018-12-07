@@ -3,17 +3,21 @@
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-# ç¦ç”¨å®‰å…¨è¯·æ±‚è­¦å‘Š
+# ½ûÓÃ°²È«ÇëÇó¾¯¸æ
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from pyquery import PyQuery as Pq
 from random import choice
 import re
 import threadpool
-
+import time
 
 def page(url):
     #if not _page:
-    r = requests.get(url,  headers = global_header ,timeout=10)
+    try:
+        r = requests.get(url,  headers = global_header ,timeout=10)
+    except Exception,e:
+        print e
+        return
     r.encoding = 'utf-8'
     _page = Pq(r.text)
     return _page
@@ -21,18 +25,35 @@ def page(url):
 
 
 def baiduURLs(url):
-    return [site.attr('href') for site in page(url)('div.result.c-container  h3.t  a').items()]
+    try:
+        return [site.attr('href') for site in page(url)('div.result.c-container  h3.t  a').items()]
+    except Exception,e:
+        print e
+        return
     
 
 def bingURLs(url):
-    return [site.attr('href') for site in page(url)('li.b_algo  a').items()]
+    try:
+        return [site.attr('href') for site in page(url)('li.b_algo  a').items()]
+    except Exception,e:
+        print e
+        return
+
 
 def qihu360URLs(url):
-    return [site.attr('href') for site in page(url)('h3.res-title a').items()]
+    try:
+        return [site.attr('href') for site in page(url)('h3.res-title a').items()]
+    except Exception,e:
+        print e
+        return
         
 
 def sogouURLs(url):
-    return  [site.attr('href') for site in page(url)('a[cacheStrategy="qcr:-1"]').items()]
+    try:
+        return  [site.attr('href') for site in page(url)('a[cacheStrategy="qcr:-1"]').items()]
+    except Exception,e:
+        print e
+        return
 
 
 
@@ -49,29 +70,35 @@ def exploit(domain):
     #_page = None
     count = 1000 
 
-    keyword = 'site:'+ root_domain
+    keyword1 = 'site:'+ root_domain
+    keyword2 = '@'+ root_domain
 
-    baidu_page = "http://www.baidu.com/baidu?wd=%s" % keyword
-    bing_page = "https://cn.bing.com/search?q=%s" % keyword
-    qihu360_page = "https://www.so.com/s?q=%s" % keyword
-    sogou_page = "https://www.sogou.com/web?query=%s" % keyword
+    baidu_page1 = "http://www.baidu.com/baidu?wd=%s" % keyword1
+    bing_page1 = "https://cn.bing.com/search?q=%s" % keyword1
+    qihu360_page1 = "https://www.so.com/s?q=%s" % keyword1
+    sogou_page1 = "https://www.sogou.com/web?query=%s" % keyword1
+
+    baidu_page2 = "http://www.baidu.com/baidu?wd=%s" % keyword2
+    bing_page2 = "https://cn.bing.com/search?q=%s" % keyword2
+    qihu360_page2 = "https://www.so.com/s?q=%s" % keyword2
+    sogou_page2 = "https://www.sogou.com/web?query=%s" % keyword2
 
     originalURLs = []
     tmpURLs = []
 
     #max_page_items = 1000
 
-    max_page_items = count#å®šä¹‰ä¸‹é»˜è®¤çš„æœ€å¤§é¡µæ•°10
+    max_page_items = count#¶¨ÒåÏÂÄ¬ÈÏµÄ×î´óÒ³Êı10
     tmpURLs = []
     #tmpURLs.append(baiduURLs)
     #_page = 'all'
-    #ç™¾åº¦urlæå–
-    print '[+]Start baidu_url extract....'
+    #°Ù¶ÈurlÌáÈ¡
+    print '[+]Start site_baidu_url extract....'
     for x in range(0,1000,10):
-        #æ­¤å¤„æ£€éªŒæ˜¯å¦å·²ç»è¶…è¿‡äº†æœ€å¤§é¡µé¢
+        #´Ë´¦¼ìÑéÊÇ·ñÒÑ¾­³¬¹ıÁË×î´óÒ³Ãæ
         current_page = (x+10)/10
-        print "[+]We've reached the baidu_page %s" % str(current_page)
-        baidu_url = baidu_page + '&pn=' +str(x)
+        print "[+]We've reached the site_baidu_page %s" % str(current_page)
+        baidu_url = baidu_page1 + '&pn=' +str(x)
         test_resp = requests.get(baidu_url,  verify=False, headers = global_header ,timeout=global_timeout ).text
         match = re.search("parseInt\(\'1\'\)",test_resp)
         if x != 0 and match:
@@ -85,34 +112,80 @@ def exploit(domain):
             break
         else:
             break
+
+    time.sleep(3)
+
+    print '[+]Start @_baidu_url extract....'
+    for x in range(0,1000,10):
+        #´Ë´¦¼ìÑéÊÇ·ñÒÑ¾­³¬¹ıÁË×î´óÒ³Ãæ
+        current_page = (x+10)/10
+        print "[+]We've reached the @_baidu_page %s" % str(current_page)
+        baidu_url = baidu_page2 + '&pn=' +str(x)
+        test_resp = requests.get(baidu_url,  verify=False, headers = global_header ,timeout=global_timeout ).text
+        match = re.search("parseInt\(\'1\'\)",test_resp)
+        if x != 0 and match:
+            break
+        baidu_url_results = baiduURLs(baidu_url)
+
+        if len(baidu_url_results):
+            tmpURLs.extend(baidu_url_results)
+        
+        if x // 10 >= max_page_items:
+            break
+        else:
+            break
+
     print tmpURLs
-    #Bing urlæå–
-    print '[+]Start bing_url extract....'
+
+
+    #Bing urlÌáÈ¡
+    print '[+]Start site_bing_url extract....'
     init_page = 0
     bing_url_comparison_item = []
     while(1):
-        bing_url = bing_page + '&first=' +str(init_page)
+        bing_url = bing_page1 + '&first=' +str(init_page)
         bing_url_results = bingURLs(bing_url)
         if len(set(bing_url_results).symmetric_difference(set(bing_url_comparison_item))):
-            #ä¸¤ä¸ªæ•°ç»„æœ‰å·®å¼‚çš„è¯ï¼Œç»§ç»­è¿è¡Œï¼Œä¼ æ‰¿bing_url_comparison_item
+            #Á½¸öÊı×éÓĞ²îÒìµÄ»°£¬¼ÌĞøÔËĞĞ£¬´«³Ğbing_url_comparison_item
             tmpURLs.extend(bing_url_results)
             bing_url_comparison_item = bing_url_results
             init_page = init_page + 1
-        #è¿™é‡Œå¯ä»¥é˜²æ­¢tagè§„åˆ™æ”¹åŠ¨ï¼Œé‡‡é›†åœä¸ä¸‹æ¥ã€‚
+        #ÕâÀï¿ÉÒÔ·ÀÖ¹tag¹æÔò¸Ä¶¯£¬²É¼¯Í£²»ÏÂÀ´¡£
         elif init_page >= max_page_items:
             break
         else:
-            break  
-    print tmpURLs 
-    #360so urlæå–
-    print '[+]Start 360so_url extract....'
+            break
+    
+    time.sleep(3)
+
+    print '[+]Start @_bing_url extract....'
+    init_page = 0
+    bing_url_comparison_item = []
+    while(1):
+        bing_url = bing_page2 + '&first=' +str(init_page)
+        bing_url_results = bingURLs(bing_url)
+        if len(set(bing_url_results).symmetric_difference(set(bing_url_comparison_item))):
+            #Á½¸öÊı×éÓĞ²îÒìµÄ»°£¬¼ÌĞøÔËĞĞ£¬´«³Ğbing_url_comparison_item
+            tmpURLs.extend(bing_url_results)
+            bing_url_comparison_item = bing_url_results
+            init_page = init_page + 1
+        #ÕâÀï¿ÉÒÔ·ÀÖ¹tag¹æÔò¸Ä¶¯£¬²É¼¯Í£²»ÏÂÀ´¡£
+        elif init_page >= max_page_items:
+            break
+        else:
+            break
+
+    print tmpURLs
+
+    #360so urlÌáÈ¡
+    print '[+]Start site_360so_url extract....'
     init_page = 1
     qihu360_url_comparison_item = []
     while(1):
-        qihu360_url = qihu360_page + '&pn=' +str(init_page)
+        qihu360_url = qihu360_page1 + '&pn=' +str(init_page)
         qihu360_url_results = qihu360URLs(qihu360_url)
         if len(set(qihu360_url_results).symmetric_difference(set(qihu360_url_comparison_item))):
-            #ä¸¤ä¸ªæ•°ç»„æœ‰å·®å¼‚çš„è¯ï¼Œç»§ç»­è¿è¡Œï¼Œä¼ æ‰¿bing_url_comparison_item
+            #Á½¸öÊı×éÓĞ²îÒìµÄ»°£¬¼ÌĞøÔËĞĞ£¬´«³Ğbing_url_comparison_item
             tmpURLs.extend(qihu360_url_results)
             qihu360_url_comparison_item = qihu360_url_results
             init_page = init_page + 1
@@ -120,16 +193,36 @@ def exploit(domain):
             break
         else:
             break
+
+    time.sleep(3)
+
+    print '[+]Start @_360so_url extract....'
+    init_page = 1
+    qihu360_url_comparison_item = []
+    while(1):
+        qihu360_url = qihu360_page2 + '&pn=' +str(init_page)
+        qihu360_url_results = qihu360URLs(qihu360_url)
+        if len(set(qihu360_url_results).symmetric_difference(set(qihu360_url_comparison_item))):
+            #Á½¸öÊı×éÓĞ²îÒìµÄ»°£¬¼ÌĞøÔËĞĞ£¬´«³Ğbing_url_comparison_item
+            tmpURLs.extend(qihu360_url_results)
+            qihu360_url_comparison_item = qihu360_url_results
+            init_page = init_page + 1
+        if init_page // 10 >= max_page_items:
+            break
+        else:
+            break
+
     print tmpURLs
-    #sogou urlæå–
-    print '[+]Start sogou_url extract....'
+
+    #sogou urlÌáÈ¡
+    print '[+]Start site_sogou_url extract....'
     init_page = 1
     sogou_url_comparison_item = []
     while(1):
-        sogou_url = sogou_page + '&page=' +str(init_page)
+        sogou_url = sogou_page1 + '&page=' +str(init_page)
         sogou_url_results = sogouURLs(sogou_url)
         if len(set(sogou_url_results).symmetric_difference(set(sogou_url_comparison_item))) and len(sogou_url_results):
-            #ä¸¤ä¸ªæ•°ç»„æœ‰å·®å¼‚çš„è¯ï¼Œç»§ç»­è¿è¡Œï¼Œä¼ æ‰¿bing_url_comparison_item
+            #Á½¸öÊı×éÓĞ²îÒìµÄ»°£¬¼ÌĞøÔËĞĞ£¬´«³Ğbing_url_comparison_item
             for sogou_url_result in sogou_url_results:
                 if 'http:' not in sogou_url_result:
                     sogou_url_result_new = 'http://www.baidu.com/' + sogou_url_result
@@ -142,12 +235,36 @@ def exploit(domain):
             break
         else:
             break
-    #aol urlæå–ã€ç‰¹ä¸ç¨³å®šï¼Œæš‚ä¸é‡‡ç”¨ã€‘https://search.aol.com/aol/search?q=site:baidu.com&b=61
-    #google urlæå–ã€æ•´åˆä»£ç†æ± åé‡‡ç”¨ã€‘
+
+    time.sleep(3)
+
+    print '[+]Start @_sogou_url extract....'
+    init_page = 1
+    sogou_url_comparison_item = []
+    while(1):
+        sogou_url = sogou_page2 + '&page=' +str(init_page)
+        sogou_url_results = sogouURLs(sogou_url)
+        if len(set(sogou_url_results).symmetric_difference(set(sogou_url_comparison_item))) and len(sogou_url_results):
+            #Á½¸öÊı×éÓĞ²îÒìµÄ»°£¬¼ÌĞøÔËĞĞ£¬´«³Ğbing_url_comparison_item
+            for sogou_url_result in sogou_url_results:
+                if 'http:' not in sogou_url_result:
+                    sogou_url_result_new = 'http://www.baidu.com/' + sogou_url_result
+                    tmpURLs.append(sogou_url_result_new)
+        
+            #tmpURLs.extend(sogou_url_results)
+            sogou_url_comparison_item = sogou_url_results
+            init_page = init_page + 1
+        if init_page // 10 >= max_page_items:
+            break
+        else:
+            break
+
+    #aol urlÌáÈ¡¡¾ÌØ²»ÎÈ¶¨£¬Ôİ²»²ÉÓÃ¡¿https://search.aol.com/aol/search?q=site:baidu.com&b=61
+    #google urlÌáÈ¡¡¾ÕûºÏ´úÀí³Øºó²ÉÓÃ¡¿
     originalURLs = list(set([tmpurl for tmpurl in tmpURLs]))
     print originalURLs
     #print originalURLs
-    #modeä¸ä¸ºç©ºè§¦å‘
+    #mode²»Îª¿Õ´¥·¢
     #if mode:
     try:
         pool = threadpool.ThreadPool(20)
@@ -160,26 +277,27 @@ def exploit(domain):
         domain_list = list(set(domain_list))
         print email_list, domain_list
         #return email_list,domain_list
-        return email_list + domain_list 
+        return email_list + domain_list
 
     except Exception,e:
         print e
     print' [+]search_engine_spider  has been end...'
     #return originalURLs
-#social_spideræ¨¡å—ç»„
+#social_spiderÄ£¿é×é
 def spider(url):
     try:
         #resp = requests.get(url, verify=False, headers ={"User-agent":choice(global_config.infos['User-Agent'])} ,timeout=global_config.infos['timeout']).text
         orignal_resp = requests.get(url, verify=False, headers = global_header ,timeout=global_timeout)
         #return resp
         #if mode == 'domain':
-        emails = get_email(orignal_resp)
-        email_list.extend(emails)
-        domains = get_domain(orignal_resp)
-        domain_list.extend(domains)
+        get_email(orignal_resp)
+        #email_list.extend(emails)
+        get_domain(orignal_resp)
+        #domain_list.extend(domains)
         #print email_list,domain_list
     except Exception,e:
-        print e
+        pass
+        #print e
 
 
 
@@ -187,31 +305,40 @@ def get_email(orignal_resp):
     resp = orignal_resp.text
     #email_list = []
     try:
+        #m1 = re.search(r'[A-Za-z0-9]+(?:[-_.][A-Za-z0-9]+)*@(?:[A-Za-z0-9]+[-.])+[A-Za-z0-9]+', resp)
+        #if not m1:
+        #    return
         m = re.findall(r'[A-Za-z0-9]+(?:[-_.][A-Za-z0-9]+)*@(?:[A-Za-z0-9]+[-.])+[A-Za-z0-9]+',resp)
         if len(m) > 0:
             for m_item in m:
                 if root_domain in m_item:
                     email_list.append(m_item)
-        return email_list
+        #return email_list
     except Exception,e:
-        print e
+        pass
+        #print e
 
 def get_domain(orignal_resp):
     resp = orignal_resp.text
     #domain_list = []
     try:
+        #m1 = re.search(r'[a-zA-Z0-9][-a-zA-Z0-9]{1,62}\.(?:[a-zA-Z0-9][-a-zA-Z0-9]{1,62}\.)+[a-zA-Z0-9][-a-zA-Z0-9]{1,62}', resp)
+        #if not m1:
+        #    return
         m = re.findall(r'[a-zA-Z0-9][-a-zA-Z0-9]{1,62}\.(?:[a-zA-Z0-9][-a-zA-Z0-9]{1,62}\.)+[a-zA-Z0-9][-a-zA-Z0-9]{1,62}', resp)
         if len(m) > 0:
             for m_item in m:
-                if root_domain in m_item:
+                if '.'+root_domain in m_item:
                     domain_list.append(m_item)
-        return domain_list
+        #return domain_list
     except Exception,e:
-        print e
+        pass
+        #print e
 
 
 if __name__ == '__main__':
-    #æ— éœ€modeï¼Œä¼ å…¥root_domainå³å¯
+    #ÎŞĞèmode£¬´«Èëroot_domain¼´¿É
     #global root_domain
     root_domain = 'baidu.com'
     exploit(root_domain)
+
